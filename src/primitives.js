@@ -21,12 +21,12 @@ export function generateX25519Keypair() {
 }
 
 export function kemEncapsulate(publicKey) {
-  const { cipherText, sharedSecret } = mlKem.ml_kem768.encapsulate(publicKey)
-  return { ciphertext: new Uint8Array(cipherText), sharedSecret: new Uint8Array(sharedSecret) }
+  const { ciphertext, sharedSecret } = mlKem.encapsulate(new Uint8Array(publicKey))
+  return { ciphertext: new Uint8Array(ciphertext), sharedSecret: new Uint8Array(sharedSecret) }
 }
 
 export function kemDecapsulate(ciphertext, secretKey) {
-  return mlKem.ml_kem768.decapsulate(new Uint8Array(ciphertext), new Uint8Array(secretKey))
+  return new Uint8Array(mlKem.decapsulate(new Uint8Array(ciphertext), new Uint8Array(secretKey)))
 }
 
 export function x25519DH(sk, pk) {
@@ -71,12 +71,15 @@ function seqNonce(seq) {
 }
 
 // ML-DSA-65 identity helpers for mutual auth
+// Wire format embeds this signature at a fixed byte offset (see FINISHED_SIZE
+// in handshake.js) — it must stay raw bytes, so we convert the wrapper's hex
+// return back to bytes rather than changing the on-the-wire shape.
 export function dsaSign(secretKey, message) {
-  return mlDsa.ml_dsa65.sign(new Uint8Array(secretKey), message)
+  return Buffer.from(mlDsa.sign(new Uint8Array(secretKey), message), 'hex')
 }
 
 export function dsaVerify(publicKey, message, signature) {
-  return mlDsa.ml_dsa65.verify(new Uint8Array(publicKey), message, new Uint8Array(signature))
+  return mlDsa.verify(new Uint8Array(publicKey), message, Buffer.from(signature).toString('hex'))
 }
 
 export { randomBytes, sha256 }

@@ -1,9 +1,9 @@
 import { mlKem, mlDsa } from 'kxco-post-quantum'
-import { x25519 } from '@noble/curves/ed25519'
-import { hkdf } from '@noble/hashes/hkdf'
-import { sha256 } from '@noble/hashes/sha256'
-import { gcm } from '@noble/ciphers/aes'
-import { randomBytes } from '@noble/ciphers/webcrypto'
+import { x25519 } from '@noble/curves/ed25519.js'
+import { hkdf } from '@noble/hashes/hkdf.js'
+import { sha256 } from '@noble/hashes/sha2.js'
+import { gcm } from '@noble/ciphers/aes.js'
+import { randomBytes } from '@noble/ciphers/utils.js'
 import { KxcoPqTlsError } from './errors.js'
 
 const PROTOCOL = new TextEncoder().encode('kxco-pq-tls-v1')
@@ -15,7 +15,7 @@ export function generateKemKeypair() {
 }
 
 export function generateX25519Keypair() {
-  const secretKey = x25519.utils.randomPrivateKey()
+  const secretKey = x25519.utils.randomSecretKey()
   const publicKey = x25519.getPublicKey(secretKey)
   return { publicKey, secretKey }
 }

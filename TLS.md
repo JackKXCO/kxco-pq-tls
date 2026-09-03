@@ -113,6 +113,23 @@ That should print `X25519`, or nothing. If both invocations print the same thing
 
 Your `openssl` binary must itself be 3.5+ — check with `openssl version`. An older client cannot offer the group, so it will report a classical result no matter what the server supports, and you will conclude the server is misconfigured when it is not.
 
+### Measured, 3 September 2026
+
+OpenSSL 3.5.6, against the live endpoints:
+
+| endpoint | negotiated group |
+|---|---|
+| `relay.kxco.ai:443` | `X25519MLKEM768` |
+| `chain.kxco.ai:443` | `X25519MLKEM768` |
+| `cloudflare.com:443` (control) | `X25519MLKEM768` |
+
+The control matters in the other direction from the one you might expect. A
+host that also negotiates the hybrid group proves the local client can offer
+it, so a KXCO endpoint reporting classical would be the endpoint's doing and
+not the test's. Re-measure after any change to the edge; this is a property of
+the deployed configuration, not of the repository, and nothing in CI holds it
+in place.
+
 ---
 
 ## nginx

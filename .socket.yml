@@ -17,7 +17,9 @@ issues:
     action: warn
 
 # kxco-post-quantum — maintained by this organisation.
-# @noble/* — Paul Miller's cryptography suite, audited by Cure53 (2024).
+# @noble/* — Paul Miller's cryptography suite. hashes was audited by Cure53 in Jan 2022,
+# curves and ciphers by Cure53 in Sep 2024. @noble/post-quantum was NOT
+# audited by anyone: self-audited by its maintainer only.
 ignore:
   - "kxco-post-quantum"
   - "@noble/post-quantum"

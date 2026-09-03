@@ -9,6 +9,14 @@ Post-quantum encrypted channels for Node.js streams and WebSockets.
 
 Wraps any duplex stream or WebSocket with ML-KEM-768 key exchange (NIST FIPS 203) and ML-DSA-65 mutual authentication (NIST FIPS 204). Both sides authenticate each other during the handshake — no anonymous connections.
 
+> ## Read this first: for HTTPS, you do not want this package
+>
+> **If you want post-quantum transport security for ordinary traffic, use TLS.** OpenSSL 3.5 and Node 24.7+/22.20+ negotiate the hybrid group `X25519MLKEM768`, which is standardised, reviewed by the whole ecosystem, and gets you the record-now-decrypt-later protection you are after with a configuration change rather than a library. [`TLS.md`](TLS.md) has the exact settings, and — the part that matters — the one command that proves the group was actually negotiated.
+>
+> This package is for the cases TLS does not cover: **mutual ML-DSA-65 identity over a channel you already have.** Two Node processes on a socket that is not HTTP. A WebSocket where both ends must prove which key they hold, not merely which certificate a CA signed. A duplex stream inside a private network.
+>
+> Its handshake is our own. It has had no third-party review, and a handshake nobody has attacked is not a handshake anyone should rely on for a public endpoint. It is secondary to TLS by design, and choosing it where TLS would do means trading a protocol the world has attacked for one it has not.
+
 ## Release integrity
 
 Every release of this package is checkable without asking us for anything.
@@ -226,7 +234,9 @@ Session encryption uses AES-256-GCM with a per-message sequence number as the no
 
 ## Security
 
-Key exchange uses [Noble post-quantum](https://github.com/paulmillr/noble-post-quantum) ML-KEM-768 combined with X25519 from [Noble curves](https://github.com/paulmillr/noble-curves). Session encryption uses AES-256-GCM from [Noble ciphers](https://github.com/paulmillr/noble-ciphers). All Noble libraries are independently audited by Cure53 (2024). A quantum adversary who breaks X25519 still cannot break the ML-KEM-768 component; both must be broken simultaneously.
+Key exchange uses [Noble post-quantum](https://github.com/paulmillr/noble-post-quantum) ML-KEM-768 combined with X25519 from [Noble curves](https://github.com/paulmillr/noble-curves). Session encryption uses AES-256-GCM from [Noble ciphers](https://github.com/paulmillr/noble-ciphers).
+
+`@noble/curves` was audited by Trail of Bits in February 2023, Kudelski Security in September 2023 and Cure53 in September 2024; `@noble/ciphers` by Cure53 in September 2024. **`@noble/post-quantum` has been audited by nobody** — it has only been self-audited by its maintainer, and an earlier version of this README implied otherwise. The handshake in this package has had no third-party review at all. That is why [`TLS.md`](TLS.md) exists and why this package is secondary to TLS for anything public. A quantum adversary who breaks X25519 still cannot break the ML-KEM-768 component; both must be broken simultaneously.
 
 To report a vulnerability, open a [private security advisory](https://github.com/KnightsbridgeAIQ/kxco-pq-tls/security/advisories/new) or email **security@kxco.ai**.
 

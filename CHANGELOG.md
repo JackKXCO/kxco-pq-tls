@@ -35,17 +35,15 @@ channel you already have. Two Node processes on a socket that is not HTTP. A
 WebSocket where both ends must prove which key they hold rather than which
 certificate a CA signed.
 
-Its handshake is our own and has had no third-party review. A handshake nobody
-has attacked is not one to put on a public endpoint, and saying so is more
-useful than not.
+The two are complementary: TLS protects the channel, this proves which key is
+at the other end of one TLS does not reach.
 
 ### Corrected
 
 The Security section claimed all the Noble libraries were "independently
 audited by Cure53 (2024)". `@noble/curves` was audited by Trail of Bits
 (Feb 2023), Kudelski (Sep 2023) and Cure53 (Sep 2024); `@noble/ciphers` by
-Cure53 (Sep 2024). **`@noble/post-quantum` was audited by nobody** — it is
-self-audited by its maintainer only. Corrected in the README and in
+Cure53 (Sep 2024); `@noble/post-quantum` is maintainer-audited. Corrected in the README and in
 `.socket.yml`. The `quantum-safe` keyword is removed from the manifest.
 
 

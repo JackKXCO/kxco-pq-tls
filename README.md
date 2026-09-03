@@ -9,6 +9,14 @@ Post-quantum encrypted channels for Node.js streams and WebSockets.
 
 Wraps any duplex stream or WebSocket with ML-KEM-768 key exchange (NIST FIPS 203) and ML-DSA-65 mutual authentication (NIST FIPS 204). Both sides authenticate each other during the handshake — no anonymous connections.
 
+## What this is for
+
+**Mutual ML-DSA-65 identity over a channel you already have.** Two Node processes on a socket that is not HTTP. A WebSocket where both ends must prove which key they hold, not merely which certificate a CA signed. A duplex stream inside a private network. Both sides authenticate during the handshake — there are no anonymous connections.
+
+**For ordinary HTTPS traffic, use TLS with the standardised hybrid group.** OpenSSL 3.5 and Node 24.7+/22.20+ negotiate `X25519MLKEM768`, which gives you record-now-decrypt-later protection at the transport layer with a configuration change and no library at all. [`TLS.md`](TLS.md) has the exact settings for Node, nginx and OpenSSL, and — the part most guides omit — the one command that proves the group was actually negotiated rather than silently skipped.
+
+The two are complementary. TLS protects the channel and leaves nothing behind once it closes. This package proves *which key* is at the other end, on a channel TLS does not reach.
+
 ## Release integrity
 
 Every release of this package is checkable without asking us for anything.
@@ -226,9 +234,19 @@ Session encryption uses AES-256-GCM with a per-message sequence number as the no
 
 ## Security
 
-Key exchange uses [Noble post-quantum](https://github.com/paulmillr/noble-post-quantum) ML-KEM-768 combined with X25519 from [Noble curves](https://github.com/paulmillr/noble-curves). Session encryption uses AES-256-GCM from [Noble ciphers](https://github.com/paulmillr/noble-ciphers). All Noble libraries are independently audited by Cure53 (2024). A quantum adversary who breaks X25519 still cannot break the ML-KEM-768 component; both must be broken simultaneously.
+**ML-DSA-65** (NIST FIPS 204) and **ML-KEM-768** (NIST FIPS 203) via [`kxco-post-quantum`](https://www.npmjs.com/package/kxco-post-quantum), running on the OpenSSL 3.5 primitives where the runtime provides them. No custom cryptography.
 
-To report a vulnerability, open a [private security advisory](https://github.com/KnightsbridgeAIQ/kxco-pq-tls/security/advisories/new) or email **security@kxco.ai**.
+Evidenced, and reproducible on your own machine:
+
+- **2,103 NIST ACVP vectors** across FIPS 203, 204 and 205, pinned by digest
+- **225 interoperability checks** against OpenSSL 3.5, liboqs, Bouncy Castle and dilithium-py/kyber-py, in both directions
+- **SLSA provenance** on every published release — verify with `npm audit signatures`
+- **CycloneDX SBOM** published with each release
+- `npm run evidence` regenerates the whole bundle from source
+
+Dependency audit history is recorded in [AUDIT.md](https://github.com/KnightsbridgeAIQ/kxco-post-quantum/blob/main/AUDIT.md).
+
+Key exchange combines ML-KEM-768 with X25519: an adversary who breaks X25519 still cannot recover the session key. For post-quantum transport on public endpoints, see [`TLS.md`](TLS.md) — OpenSSL 3.5 negotiates the standardised `X25519MLKEM768` hybrid group.
 
 ## Part of the KXCO stack
 

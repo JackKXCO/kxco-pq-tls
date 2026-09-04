@@ -224,13 +224,18 @@ If mutual authentication is requested, both sides exchange a `Finished` frame (e
 
 Session encryption uses AES-256-GCM with a per-message sequence number as the nonce.
 
-## What this does NOT do
+## Where this fits
 
-**Not a replacement for HTTPS/TLS on public servers.** If you are running an HTTP server and want quantum-safe transport to browsers, put a PQ-capable reverse proxy (e.g. Cloudflare) in front of it. This package secures the channel between two Node.js processes that both run this code.
+Quantum-safe channels between systems you control: Node.js streams and
+WebSockets, with ML-KEM-768 key exchange and optional ML-DSA-65 mutual
+authentication.
 
-**Not encryption at rest.** For quantum-safe encryption of stored data or blobs, use `kxco-pq-vault`.
+**For a public HTTPS server**, terminate TLS 1.3 with the `X25519MLKEM768`
+hybrid group at your edge; `TLS.md` has the configuration and how to prove it
+is on the wire.
 
-**Not a certificate authority.** This package does not manage or rotate long-lived identity keys. Key generation and storage is your responsibility — use `kxco-pq-hsm` if you need HSM-backed key management.
+- [`kxco-pq-vault`](https://www.npmjs.com/package/kxco-pq-vault) for data at rest
+- [`kxco-pq-hsm`](https://www.npmjs.com/package/kxco-pq-hsm) for long-lived identity keys
 
 ## Security
 

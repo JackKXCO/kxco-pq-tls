@@ -54,7 +54,8 @@
     "LICENSE",
     "README.md",
     "TLS.md",
-    "src"
+    "src",
+    "ASSESSMENT.md"
   ],
   "engines": {
     "node": ">=20.19"
@@ -66,7 +67,8 @@
     "kxco-post-quantum": "^1.3.0"
   },
   "scripts": {
-    "test": "node --test --test-timeout=15000 test/primitives.test.js test/handshake.test.js test/stream.test.js"
+    "test": "node --test --test-timeout=15000 test/primitives.test.js test/handshake.test.js test/stream.test.js",
+    "evidence": "node scripts/build-evidence.mjs"
   },
   "funding": "https://kxco.ai",
   "publishConfig": {
